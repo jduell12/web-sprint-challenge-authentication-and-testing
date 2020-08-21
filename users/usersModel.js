@@ -12,7 +12,7 @@ function getUsers() {
 }
 
 async function addUser(user) {
-  return db("users").insert(user, "id");
+  return db("users").insert(user);
 }
 
 async function getUserById(id) {
