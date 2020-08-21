@@ -38,6 +38,10 @@ router.post("/login", (req, res) => {
         if (user && bcryptjs.compareSync(password, user.password)) {
           const token = signToken(user);
           res.status(200).json({ message: "Welcome", token });
+
+          //cookies/session
+          // req.session.loggedIn = true;
+          // res.status(200).json({ message: "logged in" });
         } else {
           res.status(401).json({ message: "You shall not pass" });
         }
