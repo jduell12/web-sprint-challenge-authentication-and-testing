@@ -83,15 +83,75 @@ describe("server", () => {
     });
 
     describe("POST /login", () => {
-      it.todo("returns 400 when no username is provided");
-      it.todo("returns 400 when no password is provided");
-      it.todo("returns 400 when no password and no username is provided");
-      it.todo("returns 200 OK when logging in successfully");
-      it.todo(
-        "returns json object {message: Welcome} when login is successful",
-      );
-      it.todo("returns jwt token when login is sucessful");
-      it.todo("returns 401 when password is not correct");
+      it("returns 400 when no username is provided", async () => {
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ password: "pass" });
+
+        expect(res.status).toBe(400);
+      });
+
+      it("returns 400 when no password is provided", async () => {
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ username: "pass" });
+
+        expect(res.status).toBe(400);
+      });
+
+      it("returns 400 when no password and no username is provided", async () => {
+        const res = await supertest(server).post("/api/auth/login").send({});
+
+        expect(res.status).toBe(400);
+      });
+
+      it("returns 200 OK when logging in successfully", async () => {
+        await supertest(server)
+          .post("/api/auth/register")
+          .send({ username: "sam", password: "pass" });
+
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ username: "sam", password: "pass" });
+
+        expect(res.status).toBe(200);
+      });
+
+      it("returns json object {message: Welcome} when login is successful", async () => {
+        await supertest(server)
+          .post("/api/auth/register")
+          .send({ username: "sam", password: "pass" });
+
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ username: "sam", password: "pass" });
+
+        expect(res.body.message).toBe("Welcome");
+      });
+
+      it("returns jwt token when login is sucessful", async () => {
+        await supertest(server)
+          .post("/api/auth/register")
+          .send({ username: "sam", password: "pass" });
+
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ username: "sam", password: "pass" });
+
+        expect(res.body.token).not.toBeNull();
+      });
+
+      it("returns 401 when password is not correct", async () => {
+        await supertest(server)
+          .post("/api/auth/register")
+          .send({ username: "sam", password: "pass" });
+
+        const res = await supertest(server)
+          .post("/api/auth/login")
+          .send({ username: "sam", password: "password" });
+
+        expect(res.status).toBe(401);
+      });
     });
   });
 });
