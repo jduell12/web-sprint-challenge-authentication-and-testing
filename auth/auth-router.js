@@ -30,7 +30,41 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  // implement login
+  if (isValid(req.body)) {
+    const { username, password } = req.body;
+
+    Users.getUsersBy({ username: username })
+      .then(([user]) => {
+        if (user && bcryptjs.compareSync(password, user.password)) {
+          const tooken = signToken(user);
+          res.status(200).json({ message: "Welcome", token });
+        } else {
+          res.status(401).json({ message: "You shall not pass" });
+        }
+      })
+      .catch((err) => {
+        res.status(500).json({ error: err.message });
+      });
+  } else {
+    res.status(400).json({
+      message: "please provide a username and password",
+    });
+  }
 });
+
+function signToken(user) {
+  const payload = {
+    subject: user.id,
+    username: user.username,
+  };
+
+  const secret = constants.jwtSecret;
+
+  const options = {
+    expiresIn: "1h",
+  };
+
+  return jwt.sign(payload, secret, options);
+}
 
 module.exports = router;
